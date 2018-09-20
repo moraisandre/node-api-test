@@ -1,3 +1,4 @@
+var Joi = require('joi');
 var express = require('express');
 var app = express();
 
@@ -31,6 +32,18 @@ app.get('/api/v1/game/:id', function (req, res) {
 });
 
 app.post('/api/v1/games', (req, res) => {
+
+    const schema = {
+        name: Joi.string().min(3).required()
+    }
+
+    const result = Joi.validate(req.body, schema);
+
+    if (result.error) {
+        res.status(400).send(result.error.details[0].message)
+        return;
+    }
+
     const game = {
         id: games.length + 1,
         name: req.body.name
