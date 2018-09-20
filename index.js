@@ -27,9 +27,7 @@ app.get('/api/v1/games', function (req, res) {
 
 app.get('/api/v1/games/:id', function (req, res) {
     const game = games.find(g => g.id === parseInt(req.params.id));
-    if (!game) {
-        res.status(404).send('No game found');
-    }
+    if (!game) return res.status(404).send('No game found');
 
     res.send(game);
 });
@@ -38,10 +36,7 @@ app.post('/api/v1/games', (req, res) => {
 
     const { error } = validateGame(req.body);
 
-    if (error) {
-        res.status(400).send(error.details[0].message)
-        return;
-    }
+    if (error) return res.status(400).send(error.details[0].message)
 
     const game = {
         id: games.length + 1,
@@ -54,18 +49,25 @@ app.post('/api/v1/games', (req, res) => {
 
 app.put('/api/v1/games/:id', function (req, res) {
     const game = games.find(g => g.id === parseInt(req.params.id));
-    if (!game) {
-        res.status(404).send('No game found');
-    }
+    
+    if (!game) return res.status(404).send('No game found');
+    
 
     const { error } = validateGame(req.body);
 
-    if (error) {
-        res.status(400).send(error.details[0].message)
-        return;
-    }
+    if (error) return res.status(400).send(error.details[0].message)
 
     game.name = req.body.name;
+
+    res.send(game);
+});
+
+app.delete('/api/v1/games/:id', function (req, res) {
+    const game = games.find(g => g.id === parseInt(req.params.id));
+    if (!game) return res.status(404).send('No game found');
+
+    const index = games.indexOf(game);
+    games.splice(index, 1);
 
     res.send(game);
 });
