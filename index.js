@@ -14,6 +14,9 @@ const games = [{
     }
 ];
 
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}...`))
+
 app.get('/', function (req, res) {
     res.send('Hello World');
 });
@@ -22,7 +25,7 @@ app.get('/api/v1/games', function (req, res) {
     res.send(games);
 });
 
-app.get('/api/v1/game/:id', function (req, res) {
+app.get('/api/v1/games/:id', function (req, res) {
     const game = games.find(g => g.id === parseInt(req.params.id));
     if (!game) {
         res.status(404).send('No game found');
@@ -33,14 +36,10 @@ app.get('/api/v1/game/:id', function (req, res) {
 
 app.post('/api/v1/games', (req, res) => {
 
-    const schema = {
-        name: Joi.string().min(3).required()
-    }
+    const { error } = validateGame(req.body);
 
-    const result = Joi.validate(req.body, schema);
-
-    if (result.error) {
-        res.status(400).send(result.error.details[0].message)
+    if (error) {
+        res.status(400).send(error.details[0].message)
         return;
     }
 
@@ -53,5 +52,28 @@ app.post('/api/v1/games', (req, res) => {
     res.send(game);
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}...`))
+app.put('/api/v1/games/:id', function (req, res) {
+    const game = games.find(g => g.id === parseInt(req.params.id));
+    if (!game) {
+        res.status(404).send('No game found');
+    }
+
+    const { error } = validateGame(req.body);
+
+    if (error) {
+        res.status(400).send(error.details[0].message)
+        return;
+    }
+
+    game.name = req.body.name;
+
+    res.send(game);
+});
+
+function validateGame(game) {
+    const schema = {
+        name: Joi.string().min(3).required()
+    }
+
+    return Joi.validate(game, schema);
+}
