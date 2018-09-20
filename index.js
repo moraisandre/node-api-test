@@ -17,8 +17,8 @@ app.get('/', function (req, res) {
     res.send('Hello World');
 });
 
-app.get('/api/v1/game', function (req, res) {
-    res.send([1, 2, 3]);
+app.get('/api/v1/games', function (req, res) {
+    res.send(games);
 });
 
 app.get('/api/v1/game/:id', function (req, res) {
@@ -30,7 +30,7 @@ app.get('/api/v1/game/:id', function (req, res) {
     res.send(game);
 });
 
-app.post('api/games', (req, res) => {
+app.post('/api/v1/games', (req, res) => {
     const game = {
         id: games.length + 1,
         name: req.body.name
